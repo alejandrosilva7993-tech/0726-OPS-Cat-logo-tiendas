@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo de Tiendas</title>
+  <link href="https://unpkg.com/primeng@17.18.0/resources/themes/lara-light-blue/theme.css" rel="stylesheet">
+  <link href="https://unpkg.com/primeicons@7.0.0/primeicons.css" rel="stylesheet" crossorigin="anonymous">
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      --primary-color-text: #ffffff;
+      --primary-50: #f5f9ff;
+      --primary-100: #d0e1fd;
+      --text-color: #4b5563;
+      --text-color-secondary: #6b7280;
+      --text-heading: #374151;
+      --surface-border: #dfe7ef;
+      --surface-50: #f9fafb;
+      --surface-100: #f3f4f6;
+      --surface-200: #e5e7eb;
+      --surface-300: #d1d5db;
+      --surface-700: #374151;
+      --surface-hover: #f6f9fc;
+      --breadcrumb-link: #3b82f6;
+      --breadcrumb-link-hover: #2563eb;
+      --breadcrumb-muted: #6b7280;
+      --btn-cancel: #8b9299;
+      --btn-success: #669b37;
+      --section-gap: 1rem;
+      --table-head-bg: var(--surface-50);
+      --table-head-text: var(--surface-700);
+      --table-border: var(--surface-200);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100vh;
+      font-family: var(--font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+      background: #fff;
+      color: var(--text-color);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .pi { font-style: normal; display: inline-block; min-width: 1em; line-height: 1; }
+
+    .page-shell { min-height: 100vh; display: flex; flex-direction: column; }
+    .page-content {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem 2rem 2.5rem;
+    }
+    .page-content--wide { max-width: 1280px; }
+
+    .breadcrumb { font-size: 0.875rem; color: var(--breadcrumb-muted); margin-bottom: 0.75rem; }
+    .breadcrumb ol { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; list-style: none; }
+    .breadcrumb li + li::before { content: "/"; margin-right: 0.35rem; color: var(--breadcrumb-muted); }
+    .breadcrumb a { color: var(--breadcrumb-link); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--breadcrumb-link-hover); text-decoration: underline; }
+    .breadcrumb li[aria-current="page"] { color: var(--breadcrumb-muted); }
+
+    .page-title { font-size: 1.8rem; font-weight: 600; color: var(--text-heading); margin-bottom: 1.25rem; }
+    .page-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .form-section { margin-bottom: 2rem; }
+    .section-head {
+      padding-bottom: 0.6rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--surface-200);
+    }
+    .section-title { font-size: 1.05rem; font-weight: 600; color: #334155; margin: 0; }
+
+    .form-grid { display: grid; gap: 1.25rem 1.5rem; }
+    .form-grid--2 { grid-template-columns: repeat(4, minmax(0, 16rem)); }
+    .field { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+    .field-label { font-size: 0.875rem; font-weight: 500; color: var(--text-color); }
+    .required-mark { color: #dc2626; margin-left: 0.15rem; }
+    .field-hint { font-size: 0.75rem; color: var(--text-color-secondary); }
+    .field-error { font-size: 0.75rem; color: #dc2626; }
+
+    .form-input, .form-select {
+      width: 100%;
+      min-height: 2.25rem;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.9rem;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text-color);
+      font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-100);
+    }
+    .form-input[readonly] { background: #f8fafc; color: var(--text-color-secondary); }
+    .form-input.is-interactive { cursor: text; }
+    .form-input.invalid, .form-select.invalid { border-color: #dc2626; box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12); }
+
+    .input-with-unit { position: relative; display: flex; align-items: center; }
+    .input-with-unit .form-input { padding-right: 3rem; }
+    .input-with-unit__unit {
+      position: absolute; right: 0.75rem; font-size: 0.8125rem; font-weight: 600;
+      color: var(--text-color-secondary); pointer-events: none;
+    }
+    .unit-cubic sup { font-size: 0.62em; vertical-align: super; line-height: 0; font-weight: 600; }
+
+    .form-actions { display: flex; gap: 0.75rem; margin-top: 2rem; flex-wrap: wrap; }
+    .btn {
+      padding: 0.5rem 1.1rem;
+      min-height: 2.25rem;
+      border: 1px solid var(--surface-300);
+      background: #fff;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+    }
+    .btn-secondary { background: var(--btn-cancel); color: #fff; border-color: var(--btn-cancel); }
+    .btn-secondary:hover:not(:disabled) { background: #767d84; border-color: #767d84; }
+    .btn-success { background: var(--btn-success); color: #fff; border-color: var(--btn-success); }
+    .btn-success:hover:not(:disabled) { background: #588731; border-color: #588731; }
+    .btn-primary { background: var(--primary-color); color: #fff; border-color: var(--primary-color); font-weight: 600; }
+    .btn-primary:hover:not(:disabled) { background: #2563eb; border-color: #2563eb; }
+    .btn-outlined { background: #fff; color: #495057; border-color: #ced4da; font-weight: 500; }
+    .btn-outlined:hover:not(:disabled) { background: #f8fafc; border-color: #cbd5e1; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; pointer-events: none; }
+
+    .table-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--surface-200);
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 40;
+    }
+    .table-toolbar__left, .table-toolbar__right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .table-toolbar__left { gap: 0.5rem; }
+
+    .btn-toolbar-text {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.2rem 0.15rem;
+      border: none;
+      background: transparent;
+      color: #334155;
+      font-size: 0.875rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      line-height: 1.2;
+    }
+    .btn-toolbar-text:hover { color: #1e293b; }
+    .btn-toolbar-text .pi { font-size: 0.95rem; color: #64748b; }
+
+    .column-picker { position: relative; }
+    .column-picker__panel {
+      position: absolute;
+      top: calc(100% + 0.35rem);
+      right: 0;
+      left: auto;
+      min-width: 240px;
+      background: #fff;
+      border: 1px solid var(--surface-200);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      padding: 0.65rem 0;
+      z-index: 50;
+    }
+    .column-picker__panel.hidden { display: none; }
+    .column-picker__title {
+      padding: 0 0.85rem 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+    .column-picker__item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.8125rem;
+      cursor: pointer;
+    }
+    .column-picker__item:hover { background: #f8fafc; }
+    .column-picker__item input { accent-color: var(--primary-color); }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      overflow: hidden;
+      margin-top: var(--section-gap);
+    }
+    .data-table-scroll-pane { width: 100%; overflow-x: auto; }
+    .data-table { border-collapse: collapse; font-size: 0.8125rem; width: 100%; min-width: 1100px; }
+    .data-table th, .data-table td {
+      padding: 0.65rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--table-border);
+      vertical-align: middle;
+    }
+    .data-table thead tr.header-row { background: var(--table-head-bg); }
+    .data-table thead tr.header-row th {
+      font-weight: 700;
+      color: var(--table-head-text);
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--table-border);
+      white-space: nowrap;
+    }
+    .data-table thead tr.header-row th.sortable { cursor: pointer; }
+    .data-table thead tr.header-row th.sortable:hover { background: #f1f5f9; }
+    .col-header-content { display: inline-flex; align-items: center; gap: 0.375rem; max-width: 100%; }
+    .col-header-text { white-space: normal; line-height: 1.3; }
+    .sort-icon { font-size: 0.8rem; color: #64748b; flex-shrink: 0; }
+    .sort-icon.is-active { color: var(--primary-color); }
+
+    .data-table thead tr.filter-row { background: var(--table-head-bg); border-bottom: 2px solid var(--table-border); }
+    .data-table thead tr.filter-row th { padding: 4px 8px 8px; font-weight: 400; vertical-align: middle; }
+    .table-filter-field { display: flex; align-items: center; gap: 4px; }
+    .table-filter-input {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      height: 30px;
+      padding: 0 8px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      color: var(--text-color);
+      background: #fff;
+      outline: none;
+    }
+    .table-filter-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-100);
+    }
+    .table-filter-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: #64748b;
+      cursor: default;
+    }
+    .table-filter-btn .pi { font-size: 0.8rem; }
+    .data-table tbody tr { background: #fff; color: var(--text-color); }
+    .data-table tbody tr:nth-child(even) { background: var(--surface-50); }
+    .data-table tbody tr:hover td { background: var(--surface-hover); }
+    .data-table td.col-actions { width: 140px; }
+    .col-hidden { display: none !important; }
+
+    .row-actions { display: flex; align-items: center; gap: 0.15rem; }
+    .table-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--primary-color);
+      cursor: pointer;
+    }
+    .table-action-btn:hover { background: var(--primary-50); }
+    .table-action-btn--danger { color: #dc2626; }
+    .table-action-btn--danger:hover { background: #fef2f2; }
+
+    .table-paginator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      border-top: 1px solid var(--table-border);
+      background: #fff;
+    }
+    .table-paginator__cluster { display: inline-flex; align-items: center; gap: 0.15rem; }
+    .table-paginator__pages { display: inline-flex; align-items: center; gap: 0.15rem; }
+    .table-pag-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .table-pag-btn:hover:not(:disabled) { background: #f1f5f9; color: #334155; }
+    .table-pag-btn.is-active { background: var(--primary-50); color: var(--primary-color); font-weight: 600; }
+    .table-pag-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+    .table-paginator__select {
+      height: 1.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 0.8125rem;
+      padding: 0 0.5rem;
+      margin-left: 0.5rem;
+    }
+
+    .info-callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-bottom: 1.25rem;
+    }
+    .info-callout .pi { color: #94a3b8; font-size: 1rem; margin-top: 0.1rem; flex-shrink: 0; }
+    .info-callout__title { font-weight: 700; color: #475569; }
+    .info-callout__detail { color: var(--text-color); }
+
+    /* Departamentos */
+    .dept-panel { border: 1px solid var(--table-border); border-radius: 8px; overflow: hidden; }
+    .dept-panel__head {
+      display: grid;
+      grid-template-columns: 2rem 1fr 14rem;
+      gap: 0.75rem;
+      padding: 0.6rem 0.85rem;
+      background: var(--table-head-bg);
+      color: var(--table-head-text);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      align-items: center;
+    }
+    .dept-row {
+      display: grid;
+      grid-template-columns: 2rem 1fr 14rem;
+      gap: 0.75rem;
+      padding: 0.55rem 0.85rem;
+      border-top: 1px solid var(--table-border);
+      align-items: center;
+    }
+    .dept-row:nth-child(odd) { background: var(--surface-50); }
+    .dept-row:hover { background: var(--surface-hover); }
+    .dept-row__check { display: flex; align-items: center; justify-content: center; }
+    .dept-row__check input { accent-color: var(--primary-color); width: 1rem; height: 1rem; cursor: pointer; }
+    .dept-row__name { font-size: 0.8125rem; font-weight: 500; color: var(--surface-700); }
+    .dept-row__height { display: flex; flex-direction: column; gap: 0.2rem; }
+    .dept-row__height .input-with-unit .form-input { min-height: 2rem; font-size: 0.8125rem; }
+    .dept-row__height .form-input:disabled { background: #f1f5f9; color: #94a3b8; pointer-events: none; }
+    .dept-row__error { font-size: 0.72rem; color: #dc2626; }
+    .dept-toolbar { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .dept-select-all { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8125rem; cursor: pointer; }
+    .dept-select-all input { accent-color: var(--primary-color); }
+
+    .readonly-dept .dept-row__check input,
+    .readonly-dept .dept-row__height .form-input { pointer-events: none; }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .meta-item__label { font-size: 0.75rem; color: var(--text-color-secondary); margin-bottom: 0.2rem; }
+    .meta-item__value { font-size: 0.875rem; font-weight: 500; color: #334155; }
+
+    .detail-table {
+      width: 100%; border-collapse: collapse; font-size: 0.875rem;
+      border: 1px solid var(--table-border);
+      margin-bottom: 1.75rem;
+    }
+    .detail-table th, .detail-table td {
+      border-bottom: 1px solid var(--table-border);
+      padding: 0.7rem 1rem; vertical-align: middle;
+    }
+    .detail-table tr:last-child th, .detail-table tr:last-child td { border-bottom: none; }
+    .detail-table th {
+      width: 30%;
+      background: var(--surface-50); color: var(--surface-700);
+      font-weight: 700; text-align: left; border-right: 1px solid var(--table-border);
+    }
+    .detail-table td { text-align: center; color: var(--text-color); }
+
+    .detail-count { font-size: 0.875rem; color: var(--text-color); margin-bottom: 0.5rem; }
+    .detail-dept-table { width: 100%; border-collapse: collapse; font-size: 0.875rem;
+      border: 1px solid var(--table-border); }
+    .detail-dept-table th, .detail-dept-table td {
+      padding: 0.7rem 1rem; border-bottom: 1px solid var(--table-border); text-align: left;
+    }
+    .detail-dept-table thead th {
+      background: #fff; color: var(--primary-color); font-weight: 700; cursor: default;
+      white-space: nowrap;
+    }
+    .detail-dept-table thead th .sort-caret { font-size: 0.7rem; margin-left: 0.35rem; opacity: 0.6; }
+    .detail-dept-table tbody tr:last-child td { border-bottom: none; }
+    .detail-dept-table tbody td { color: var(--text-color); }
+    .detail-dept-table td.dept-height-inherited { color: var(--text-color-secondary); font-style: italic; }
+
+    .view-hidden { display: none !important; }
+    .hidden { display: none !important; }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); z-index: 1200;
+      display: flex; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-card {
+      background: #fff; border-radius: 8px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+      width: 100%; max-width: 420px; padding: 1.25rem;
+    }
+    .modal-card--wide { max-width: 480px; }
+    .modal-card__head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+    .modal-card__icon {
+      flex-shrink: 0; width: 1.5rem; height: 1.5rem; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 0.8rem;
+    }
+    .modal-card__icon--question { background: var(--primary-color); }
+    .modal-card__head .modal-card__title { margin-bottom: 0; }
+    .modal-card__title { font-size: 1rem; font-weight: 600; color: #334155; margin-bottom: 0.75rem; }
+    .modal-card__body { font-size: 0.875rem; color: var(--text-color); margin-bottom: 1.25rem; line-height: 1.5; }
+    .modal-card__actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+    .export-format-list { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+    .export-format-list label {
+      display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.5rem; border-radius: 6px; cursor: pointer; font-size: 0.875rem;
+    }
+    .export-format-list label:hover { background: #f8fafc; }
+
+    /* PrimeNG Toast: estructura del core (los colores/tipografía los aporta el theme.css de Lara) */
+    .p-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 25rem;
+      max-width: calc(100% - 40px);
+      z-index: 1300;
+    }
+    .p-toast .p-toast-message {
+      margin: 0 0 1rem 0;
+      overflow: hidden;
+    }
+    .p-toast .p-toast-message-content {
+      display: flex;
+      align-items: flex-start;
+    }
+    .p-toast .p-toast-message-text {
+      flex: 1 1 auto;
+    }
+    /* Proporcionar el icono (el tema lo fija en 2rem, muy grande con primeicons) */
+    .p-toast .p-toast-message .p-toast-message-content {
+      padding: 1rem 1rem 1rem 1.25rem;
+    }
+    .p-toast .p-toast-message .p-toast-message-content .p-toast-message-icon {
+      font-size: 1.25rem;
+      margin-top: 0.15rem;
+    }
+    .p-toast .p-toast-message .p-toast-message-content .p-toast-message-text {
+      margin: 0 0 0 0.75rem;
+    }
+    .p-toast .p-toast-icon-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 2rem;
+      height: 2rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .page-footer {
+      margin-top: auto; padding: 0.65rem 1rem; text-align: center;
+      font-size: 0.8rem; color: #9ca3af; background: #f3f4f6; border-top: 1px solid #e5e7eb;
+    }
+
+    @media (max-width: 900px) {
+      .form-grid--2 { grid-template-columns: repeat(2, minmax(0, 16rem)); }
+      .meta-grid { grid-template-columns: 1fr; }
+      .dept-panel__head, .dept-row { grid-template-columns: 1.75rem 1fr 10rem; }
+      .detail-list li { flex-direction: column; gap: 0.1rem; }
+      .detail-list__label { min-width: 0; }
+    }
+    @media (max-width: 640px) {
+      .page-content { padding: 1rem; }
+      .form-grid--2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <main class="page-content" id="mainContent">
+
+      <!-- LISTADO -->
+      <div id="listView">
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <ol>
+            <li><a href="#">Catálogos</a></li>
+            <li aria-current="page">Tiendas</li>
+          </ol>
+        </nav>
+        <div class="page-header-row">
+          <h1 class="page-title" style="margin-bottom:0">Tiendas</h1>
+        </div>
+
+        <div class="table-toolbar">
+          <div class="table-toolbar__left">
+            <button type="button" class="btn btn-primary" id="goCreateBtn">
+              <i class="pi pi-plus-circle" aria-hidden="true"></i> Crear tienda
+            </button>
+            <button type="button" class="btn btn-outlined" id="exportBtn">
+              <i class="pi pi-download" aria-hidden="true"></i> Exportar registros
+            </button>
+          </div>
+          <div class="table-toolbar__right">
+            <div class="column-picker">
+              <button type="button" class="btn-toolbar-text" id="columnToggleBtn" aria-expanded="false" aria-controls="columnPickerPanel">
+                <i class="pi pi-eye-slash" aria-hidden="true"></i> Columnas
+              </button>
+              <div id="columnPickerPanel" class="column-picker__panel hidden" role="dialog" aria-label="Columnas visibles"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="data-table-scroll-pane">
+            <table class="data-table" id="listTable">
+              <thead>
+                <tr class="header-row" id="listTableHead"></tr>
+                <tr class="filter-row" id="listTableFilterRow"></tr>
+              </thead>
+              <tbody id="listTableBody"></tbody>
+            </table>
+          </div>
+          <nav class="table-paginator" aria-label="Paginación">
+            <div class="table-paginator__cluster">
+              <button type="button" class="table-pag-btn" id="pagFirst" aria-label="Primera página"><i class="pi pi-angle-double-left"></i></button>
+              <button type="button" class="table-pag-btn" id="pagPrev" aria-label="Página anterior"><i class="pi pi-angle-left"></i></button>
+              <div class="table-paginator__pages" id="pagPages"></div>
+              <button type="button" class="table-pag-btn" id="pagNext" aria-label="Página siguiente"><i class="pi pi-angle-right"></i></button>
+              <button type="button" class="table-pag-btn" id="pagLast" aria-label="Última página"><i class="pi pi-angle-double-right"></i></button>
+              <select id="pageSizeSelect" class="table-paginator__select" aria-label="Registros por página">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+      <!-- CREAR -->
+      <div id="createView" class="view-hidden">
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <ol>
+            <li><a href="#" data-nav="list">Catálogos</a></li>
+            <li><a href="#" data-nav="list">Tiendas</a></li>
+            <li aria-current="page">Crear tienda</li>
+          </ol>
+        </nav>
+        <h1 class="page-title">Crear tienda</h1>
+        <div id="createFormRoot"></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" data-nav="list">Cancelar</button>
+          <button type="button" class="btn btn-success" id="createSubmitBtn">Crear</button>
+        </div>
+      </div>
+
+      <!-- EDITAR -->
+      <div id="editView" class="view-hidden">
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <ol>
+            <li><a href="#" data-nav="list">Catálogos</a></li>
+            <li><a href="#" data-nav="list">Tiendas</a></li>
+            <li aria-current="page" id="editBreadcrumbCurrent">Actualizar tienda</li>
+          </ol>
+        </nav>
+        <h1 class="page-title" id="editPageTitle">Actualizar tienda</h1>
+        <div id="editFormRoot"></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" data-nav="list">Cancelar</button>
+          <button type="button" class="btn btn-success" id="editSubmitBtn">Actualizar</button>
+        </div>
+      </div>
+
+      <!-- DETALLE -->
+      <div id="detailView" class="view-hidden">
+        <nav class="breadcrumb" aria-label="Ruta de navegación">
+          <ol>
+            <li><a href="#" data-nav="list">Catálogos</a></li>
+            <li><a href="#" data-nav="list">Tiendas</a></li>
+            <li aria-current="page" id="detailBreadcrumbCurrent">Detalle de tienda</li>
+          </ol>
+        </nav>
+        <h1 class="page-title" id="detailPageTitle">Detalle de tienda</h1>
+        <div class="page-header-row" style="margin-bottom:1.25rem">
+          <button type="button" class="btn btn-primary" id="detailEditBtn"><i class="pi pi-pencil" aria-hidden="true"></i> Editar</button>
+        </div>
+        <div id="detailFormRoot"></div>
+      </div>
+
+    </main>
+    <footer class="page-footer">3.35.134 ©Netlogistik 2026</footer>
+  </div>
+
+  <!-- Modal eliminar MSG004 -->
+  <div id="deleteModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+    <div class="modal-card">
+      <div class="modal-card__title" id="deleteModalTitle">Eliminar tienda</div>
+      <div class="modal-card__body" id="deleteModalBody">¿Estás seguro de eliminar este registro? <strong>Esta acción no puede revertirse.</strong></div>
+      <div class="modal-card__actions">
+        <button type="button" class="btn btn-secondary" id="deleteCancelBtn">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="deleteConfirmBtn">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal exportar -->
+  <div id="exportModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">
+    <div class="modal-card modal-card--wide">
+      <div class="modal-card__title" id="exportModalTitle">Exportar registros</div>
+      <div class="modal-card__body">Selecciona el tipo de archivo para la exportación:</div>
+      <div class="export-format-list" id="exportFormatList"></div>
+      <div class="modal-card__actions">
+        <button type="button" class="btn btn-secondary" id="exportCancelBtn">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="exportConfirmBtn">Exportar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="p-toast p-toast-top-right" role="region" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      var STORAGE_KEY = 'opsStoresCatalog';
+      var CURRENT_USER = 'admin.wms';
+      // Hasta 10 enteros y hasta 3 decimales, positivo.
+      var HEIGHT_FORMAT = /^\d{1,10}(\.\d{1,3})?$/;
+      var ID_FORMAT = /^[A-Za-z0-9_-]{3,50}$/;
+      var NAME_FORMAT = /^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñÜü .,'\-]{3,50}$/;
+      var VOLUME_UNIT = '<span class="unit-cubic">m<sup>3</sup></span>';
+
+      var CONSIGNATARIOS = [
+        { id: 'CON-001', nombre: 'Grupo Comercial del Norte' },
+        { id: 'CON-002', nombre: 'Distribuidora Península' },
+        { id: 'CON-003', nombre: 'Abarrotes del Bajío' },
+        { id: 'CON-004', nombre: 'Consorcio Retail Centro' },
+        { id: 'CON-005', nombre: 'Logística Pacífico' }
+      ];
+
+      var DEPARTAMENTOS = [
+        { id: 'DEP-01', nombre: 'Abarrotes', estatus: 'Activo' },
+        { id: 'DEP-02', nombre: 'Perecederos', estatus: 'Activo' },
+        { id: 'DEP-03', nombre: 'Lácteos', estatus: 'Activo' },
+        { id: 'DEP-04', nombre: 'Panadería', estatus: 'Activo' },
+        { id: 'DEP-05', nombre: 'Limpieza', estatus: 'Activo' },
+        { id: 'DEP-06', nombre: 'Electrónica', estatus: 'Activo' },
+        { id: 'DEP-07', nombre: 'Ropa', estatus: 'Inactivo' },
+        { id: 'DEP-08', nombre: 'Juguetería', estatus: 'Inactivo' }
+      ];
+
+      function activeDepartments() {
+        return DEPARTAMENTOS.filter(function (d) { return d.estatus === 'Activo'; });
+      }
+      function deptName(id) {
+        var d = DEPARTAMENTOS.find(function (x) { return x.id === id; });
+        return d ? d.nombre : id;
+      }
+      function consignatarioName(id) {
+        var c = CONSIGNATARIOS.find(function (x) { return x.id === id; });
+        return c ? c.nombre : id;
+      }
+
+      var EXPORT_FORMATS = [
+        { id: 'html', label: 'HTML' },
+        { id: 'csv', label: 'CSV' },
+        { id: 'text', label: 'Text' },
+        { id: 'pdf', label: 'PDF' },
+        { id: 'xls', label: 'Excel 95 +' },
+        { id: 'xlsx', label: 'Excel 2007 +' }
+      ];
+
+      var COLUMNS = [
+        { key: 'id', label: 'Identificador de tienda', visible: true },
+        { key: 'nombre', label: 'Nombre de tienda', visible: true },
+        { key: 'consignatarioNombre', label: 'Consignatario asociado', visible: true },
+        { key: 'departamentosLabel', label: 'Departamentos asociados', visible: true },
+        { key: 'alturaMaxima', label: 'Altura máxima de tienda', visible: true },
+        { key: 'updatedBy', label: 'Actualizado por', visible: true },
+        { key: 'updatedAt', label: 'Actualizado', visible: true },
+        { key: 'createdAt', label: 'Creado', visible: false }
+      ];
+
+      var listState = { filters: {}, page: 1, pageSize: 10, sortKey: null, sortDir: 'asc' };
+      var NUMERIC_KEYS = ['alturaMaxima'];
+      var editingId = null;
+      var deletingId = null;
+      var selectedExportFormat = 'csv';
+      var lastDetailId = null;
+      var storeForms = {};
+
+      function cloneDeep(obj) { return JSON.parse(JSON.stringify(obj)); }
+
+      function seedRecords() {
+        var names = [
+          'Tienda Centro CDMX', 'Tienda Reforma', 'Tienda Guadalajara Sur',
+          'Tienda Monterrey Valle', 'Tienda Puebla Angelópolis', 'Tienda Querétaro Juriquilla',
+          'Tienda Mérida Norte', 'Tienda Tijuana Río', 'Tienda León Poniente', 'Tienda Cancún Centro'
+        ];
+        var users = ['jperez', 'mlopez', 'admin.wms', 'rgarcia', 'acastillo'];
+        var heights = ['3.500', '4.000', '2.750', '5.000', '3.250', '4.500', '3.000', '2.500', '4.250', '3.750'];
+        var records = [];
+        var actives = activeDepartments();
+        for (var i = 0; i < 10; i++) {
+          var created = new Date(2026, 0, 5 + i * 3, 9 + (i % 8), 15, 0);
+          var updated = new Date(2026, 5, 1 + i, 14, 30, 0);
+          var deptCount = 2 + (i % 4);
+          var deps = [];
+          for (var j = 0; j < deptCount && j < actives.length; j++) {
+            var dep = actives[(i + j) % actives.length];
+            if (deps.some(function (d) { return d.id === dep.id; })) continue;
+            var alt = j % 2 === 0 ? '' : (parseFloat(heights[i]) - 0.5).toFixed(3);
+            deps.push({ id: dep.id, altura: alt });
+          }
+          records.push({
+            id: 'TDA-' + String(i + 1).padStart(3, '0'),
+            nombre: names[i],
+            consignatario: CONSIGNATARIOS[i % CONSIGNATARIOS.length].id,
+            alturaMaxima: heights[i],
+            departamentos: deps,
+            updatedBy: users[i % users.length],
+            updatedAt: updated.toISOString(),
+            createdAt: created.toISOString(),
+            deleted: false,
+            auditLog: []
+          });
+        }
+        return records;
+      }
+
+      var Store = {
+        load: function () {
+          try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) {
+              var seed = seedRecords();
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
+              return seed;
+            }
+            return JSON.parse(raw);
+          } catch (e) {
+            return seedRecords();
+          }
+        },
+        saveAll: function (records) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        },
+        getActive: function () {
+          return Store.load().filter(function (r) { return !r.deleted; });
+        },
+        getById: function (id) {
+          return Store.load().find(function (r) { return r.id === id && !r.deleted; }) || null;
+        },
+        idExists: function (id, excludeId) {
+          return Store.load().some(function (r) {
+            return !r.deleted && r.id.toLowerCase() === id.toLowerCase() && (!excludeId || r.id !== excludeId);
+          });
+        },
+        create: function (record) {
+          var all = Store.load();
+          all.push(record);
+          Store.saveAll(all);
+        },
+        update: function (id, patch) {
+          var all = Store.load();
+          var idx = all.findIndex(function (r) { return r.id === id; });
+          if (idx === -1) return null;
+          all[idx] = Object.assign({}, all[idx], patch);
+          Store.saveAll(all);
+          return all[idx];
+        },
+        softDelete: function (id) {
+          return Store.update(id, { deleted: true });
+        }
+      };
+
+      function decorate(row) {
+        return Object.assign({}, row, {
+          consignatarioNombre: consignatarioName(row.consignatario),
+          departamentosLabel: (row.departamentos || []).map(function (d) { return deptName(d.id); }).join(', ')
+        });
+      }
+
+      function formatDateTime(iso) {
+        if (!iso) return '—';
+        return new Date(iso).toLocaleString('es-MX', {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        });
+      }
+
+      function formatDateTimeLong(iso) {
+        if (!iso) return '—';
+        return new Date(iso).toLocaleString('es-MX', {
+          day: 'numeric', month: 'long', year: 'numeric',
+          hour: 'numeric', minute: '2-digit', second: '2-digit',
+          timeZoneName: 'short'
+        });
+      }
+
+      function showToast(detail, summary, severity) {
+        severity = severity || 'success';
+        var iconMap = { success: 'pi-check', info: 'pi-info-circle', warn: 'pi-exclamation-triangle', error: 'pi-times-circle' };
+        var container = document.getElementById('toast');
+        var msg = document.createElement('div');
+        msg.className = 'p-toast-message p-toast-message-' + severity + ' p-toast-message-enter-done';
+        msg.setAttribute('role', 'alert');
+        msg.innerHTML =
+          '<div class="p-toast-message-content">' +
+            '<span class="p-toast-message-icon pi ' + (iconMap[severity] || 'pi-check') + '"></span>' +
+            '<div class="p-toast-message-text">' +
+              '<span class="p-toast-summary">' + escapeHtml(summary || '') + '</span>' +
+              '<div class="p-toast-detail">' + escapeHtml(detail) + '</div>' +
+            '</div>' +
+            '<button type="button" class="p-toast-icon-close p-link" aria-label="Cerrar">' +
+              '<span class="p-toast-icon-close-icon pi pi-times"></span>' +
+            '</button>' +
+          '</div>';
+        container.appendChild(msg);
+        var close = function () { if (msg.parentNode) msg.parentNode.removeChild(msg); };
+        msg.querySelector('.p-toast-icon-close').addEventListener('click', close);
+        setTimeout(close, 3500);
+      }
+
+      function showView(name) {
+        var views = ['listView', 'createView', 'editView', 'detailView'];
+        views.forEach(function (v) {
+          document.getElementById(v).classList.toggle('view-hidden', v !== name + 'View');
+        });
+        var main = document.getElementById('mainContent');
+        main.classList.toggle('page-content--wide', name === 'list');
+        if (name === 'list') renderList();
+        window.scrollTo(0, 0);
+      }
+
+      /* ---- StoreForm module ---- */
+      function StoreForm(prefix, mode) {
+        this.prefix = prefix;
+        this.mode = mode === 'readonly' ? 'readonly' : 'edit';
+        this.selectedDepts = {}; // id -> altura string
+      }
+
+      StoreForm.prototype.el = function (suffix) {
+        return document.getElementById(this.prefix + '-' + suffix);
+      };
+
+      StoreForm.prototype.mount = function (root, options) {
+        options = options || {};
+        this.options = options;
+        var p = this.prefix;
+        var readonly = this.mode === 'readonly';
+        var idReadonly = readonly || options.idReadonly;
+
+        root.innerHTML =
+          '<section class="form-section">' +
+            '<div class="section-head"><h2 class="section-title">Información general</h2></div>' +
+            '<div class="form-grid form-grid--2">' +
+              '<div class="field">' +
+                '<label class="field-label" for="' + p + '-id">Identificador de la tienda<span class="required-mark" aria-hidden="true">*</span></label>' +
+                '<input id="' + p + '-id" type="text" class="form-input' + (idReadonly ? '' : ' is-interactive') + '" maxlength="50" ' + (idReadonly ? 'readonly' : '') + '>' +
+                '<span class="field-error" id="' + p + '-id-error" hidden></span>' +
+              '</div>' +
+              '<div class="field">' +
+                '<label class="field-label" for="' + p + '-nombre">Nombre<span class="required-mark" aria-hidden="true">*</span></label>' +
+                '<input id="' + p + '-nombre" type="text" class="form-input' + (readonly ? '' : ' is-interactive') + '" maxlength="50" ' + (readonly ? 'readonly' : '') + '>' +
+                '<span class="field-error" id="' + p + '-nombre-error" hidden></span>' +
+              '</div>' +
+              '<div class="field">' +
+                '<label class="field-label" for="' + p + '-consignatario">Consignatario<span class="required-mark" aria-hidden="true">*</span></label>' +
+                '<select id="' + p + '-consignatario" class="form-select" ' + (readonly ? 'disabled' : '') + '></select>' +
+                '<span class="field-error" id="' + p + '-consignatario-error" hidden></span>' +
+              '</div>' +
+              '<div class="field">' +
+                '<label class="field-label" for="' + p + '-altura">Altura máxima de la tarima (tienda)<span class="required-mark" aria-hidden="true">*</span></label>' +
+                '<div class="input-with-unit">' +
+                  '<input id="' + p + '-altura" type="text" inputmode="decimal" class="form-input' + (readonly ? '' : ' is-interactive') + '" ' + (readonly ? 'readonly' : '') + ' placeholder="0.000">' +
+                  '<span class="input-with-unit__unit">' + VOLUME_UNIT + '</span>' +
+                '</div>' +
+                '<span class="field-error" id="' + p + '-altura-error" hidden></span>' +
+              '</div>' +
+            '</div>' +
+          '</section>' +
+          (options.showMeta ? (
+            '<div class="meta-grid" id="' + p + '-meta">' +
+              '<div class="meta-item"><div class="meta-item__label">Actualizado por</div><div class="meta-item__value" id="' + p + '-updatedBy"></div></div>' +
+              '<div class="meta-item"><div class="meta-item__label">Actualizado</div><div class="meta-item__value" id="' + p + '-updatedAt"></div></div>' +
+              '<div class="meta-item"><div class="meta-item__label">Creado</div><div class="meta-item__value" id="' + p + '-createdAt"></div></div>' +
+            '</div>'
+          ) : '') +
+          '<section class="form-section' + (readonly ? ' readonly-dept' : '') + '">' +
+            '<div class="section-head"><h2 class="section-title">Departamentos<span class="required-mark" aria-hidden="true">*</span></h2></div>' +
+            '<div class="info-callout" role="note">' +
+              '<i class="pi pi-info-circle" aria-hidden="true"></i>' +
+              '<div>' +
+                '<div class="info-callout__title">Selecciona al menos un departamento.</div>' +
+                '<div class="info-callout__detail">La altura por departamento es opcional y no puede superar la de la tienda.</div>' +
+              '</div>' +
+            '</div>' +
+            (readonly ? '' :
+              '<div class="dept-toolbar">' +
+                '<label class="dept-select-all"><input type="checkbox" id="' + p + '-dept-all"> Seleccionar todos</label>' +
+              '</div>') +
+            '<div class="dept-panel">' +
+              '<div class="dept-panel__head"><span></span><span>Departamento</span><span>Altura máxima (' + VOLUME_UNIT + ')</span></div>' +
+              '<div id="' + p + '-dept-rows"></div>' +
+            '</div>' +
+            '<span class="field-error" id="' + p + '-dept-error" hidden style="margin-top:0.5rem"></span>' +
+          '</section>';
+
+        // Poblar consignatarios
+        var sel = this.el('consignatario');
+        sel.innerHTML = '<option value=""></option>' +
+          CONSIGNATARIOS.map(function (c) {
+            return '<option value="' + c.id + '">' + c.nombre + '</option>';
+          }).join('');
+
+        this.renderDepartments();
+        this.bindEvents();
+      };
+
+      StoreForm.prototype.bindEvents = function () {
+        if (this.mode === 'readonly') return;
+        var self = this;
+        var all = this.el('dept-all');
+        if (all) {
+          all.addEventListener('change', function () {
+            activeDepartments().forEach(function (d) {
+              if (all.checked) { if (!(d.id in self.selectedDepts)) self.selectedDepts[d.id] = ''; }
+              else { delete self.selectedDepts[d.id]; }
+            });
+            self.renderDepartments();
+          });
+        }
+      };
+
+      StoreForm.prototype.renderDepartments = function () {
+        var self = this;
+        var readonly = this.mode === 'readonly';
+        var container = this.el('dept-rows');
+        if (!container) return;
+        var deps = readonly ? DEPARTAMENTOS.filter(function (d) { return d.id in self.selectedDepts; }) : activeDepartments();
+        container.innerHTML = '';
+        deps.forEach(function (d) {
+          var checked = d.id in self.selectedDepts;
+          var altura = self.selectedDepts[d.id] || '';
+          var row = document.createElement('div');
+          row.className = 'dept-row';
+          row.innerHTML =
+            '<div class="dept-row__check"><input type="checkbox" data-dept="' + d.id + '" ' + (checked ? 'checked' : '') + ' ' + (readonly ? 'disabled' : '') + '></div>' +
+            '<div class="dept-row__name">' + d.nombre + '</div>' +
+            '<div class="dept-row__height">' +
+              '<div class="input-with-unit">' +
+                '<input type="text" inputmode="decimal" class="form-input" data-dept-height="' + d.id + '" value="' + altura + '" placeholder="0.000" ' + (readonly || !checked ? 'disabled' : '') + '>' +
+                '<span class="input-with-unit__unit">' + VOLUME_UNIT + '</span>' +
+              '</div>' +
+              '<span class="dept-row__error" data-dept-error="' + d.id + '" hidden></span>' +
+            '</div>';
+          container.appendChild(row);
+        });
+
+        if (readonly) return;
+
+        container.querySelectorAll('[data-dept]').forEach(function (cb) {
+          cb.addEventListener('change', function () {
+            var id = cb.dataset.dept;
+            if (cb.checked) self.selectedDepts[id] = self.selectedDepts[id] || '';
+            else delete self.selectedDepts[id];
+            var heightInput = container.querySelector('[data-dept-height="' + id + '"]');
+            if (heightInput) heightInput.disabled = !cb.checked;
+            self.syncSelectAll();
+          });
+        });
+        container.querySelectorAll('[data-dept-height]').forEach(function (inp) {
+          inp.addEventListener('input', function () {
+            self.selectedDepts[inp.dataset.deptHeight] = inp.value.trim();
+          });
+        });
+        this.syncSelectAll();
+      };
+
+      StoreForm.prototype.syncSelectAll = function () {
+        var all = this.el('dept-all');
+        if (!all) return;
+        var actives = activeDepartments();
+        var selectedCount = actives.filter(function (d) { return d.id in this.selectedDepts; }, this).length;
+        all.checked = selectedCount === actives.length && actives.length > 0;
+        all.indeterminate = selectedCount > 0 && selectedCount < actives.length;
+      };
+
+      StoreForm.prototype.loadData = function (rec) {
+        this.el('id').value = rec.id;
+        this.el('nombre').value = rec.nombre;
+        this.el('consignatario').value = rec.consignatario;
+        this.el('altura').value = rec.alturaMaxima;
+        this.selectedDepts = {};
+        (rec.departamentos || []).forEach(function (d) {
+          this.selectedDepts[d.id] = d.altura || '';
+        }, this);
+        this.renderDepartments();
+        if (this.options && this.options.showMeta) {
+          this.el('updatedBy').textContent = rec.updatedBy || '—';
+          this.el('updatedAt').textContent = formatDateTime(rec.updatedAt);
+          this.el('createdAt').textContent = formatDateTime(rec.createdAt);
+        }
+      };
+
+      StoreForm.prototype.reset = function () {
+        this.el('id').value = '';
+        this.el('nombre').value = '';
+        this.el('consignatario').value = '';
+        this.el('altura').value = '';
+        this.selectedDepts = {};
+        this.renderDepartments();
+        this.clearErrors();
+      };
+
+      StoreForm.prototype.setError = function (field, msg) {
+        var err = this.el(field + '-error');
+        var input = this.el(field);
+        if (err) { err.textContent = msg; err.hidden = !msg; }
+        if (input) input.classList.toggle('invalid', !!msg);
+      };
+
+      StoreForm.prototype.clearErrors = function () {
+        ['id', 'nombre', 'consignatario', 'altura', 'dept'].forEach(function (f) { this.setError(f, ''); }, this);
+        var container = this.el('dept-rows');
+        if (container) container.querySelectorAll('[data-dept-error]').forEach(function (e) { e.hidden = true; e.textContent = ''; });
+      };
+
+      StoreForm.prototype.validate = function (excludeId) {
+        this.clearErrors();
+        var ok = true;
+        var id = this.el('id').value.trim();
+        var nombre = this.el('nombre').value.trim();
+        var consignatario = this.el('consignatario').value;
+        var altura = this.el('altura').value.trim();
+
+        if (!ID_FORMAT.test(id)) {
+          this.setError('id', 'Ingresa un identificador alfanumérico de 3 a 50 caracteres.');
+          ok = false;
+        } else if (Store.idExists(id, excludeId)) {
+          this.setError('id', 'El identificador ya existe. Debe ser único por sitio.');
+          ok = false;
+        }
+
+        if (!NAME_FORMAT.test(nombre)) {
+          this.setError('nombre', 'Ingresa un nombre de 3 a 50 caracteres.');
+          ok = false;
+        }
+
+        if (!consignatario) {
+          this.setError('consignatario', 'Selecciona un consignatario.');
+          ok = false;
+        }
+
+        var alturaNum = parseFloat(altura);
+        if (!HEIGHT_FORMAT.test(altura) || !(alturaNum > 0)) {
+          this.setError('altura', 'Ingresa un valor decimal positivo (hasta 10 enteros y 3 decimales).');
+          ok = false;
+        }
+
+        var selectedIds = Object.keys(this.selectedDepts);
+        if (selectedIds.length === 0) {
+          this.setError('dept', 'Selecciona al menos un departamento.');
+          ok = false;
+        }
+
+        var container = this.el('dept-rows');
+        selectedIds.forEach(function (depId) {
+          var val = (this.selectedDepts[depId] || '').trim();
+          if (!val) return; // opcional
+          var errEl = container ? container.querySelector('[data-dept-error="' + depId + '"]') : null;
+          var depNum = parseFloat(val);
+          if (!HEIGHT_FORMAT.test(val) || !(depNum > 0)) {
+            if (errEl) { errEl.textContent = 'Valor decimal positivo (hasta 10 enteros y 3 decimales).'; errEl.hidden = false; }
+            ok = false;
+          } else if (HEIGHT_FORMAT.test(altura) && depNum > alturaNum) {
+            if (errEl) { errEl.textContent = 'No puede exceder la altura máxima de la tienda (' + altura + ' m³).'; errEl.hidden = false; }
+            ok = false;
+          }
+        }, this);
+
+        return ok;
+      };
+
+      StoreForm.prototype.getValues = function () {
+        var self = this;
+        return {
+          id: this.el('id').value.trim(),
+          nombre: this.el('nombre').value.trim(),
+          consignatario: this.el('consignatario').value,
+          alturaMaxima: this.el('altura').value.trim(),
+          departamentos: Object.keys(this.selectedDepts).map(function (id) {
+            return { id: id, altura: (self.selectedDepts[id] || '').trim() };
+          })
+        };
+      };
+
+      /* ---- List ---- */
+      function getFilteredRecords() {
+        var rows = Store.getActive().map(decorate).filter(function (row) {
+          return COLUMNS.every(function (col) {
+            var f = (listState.filters[col.key] || '').trim().toLowerCase();
+            if (!f) return true;
+            var val = col.key === 'updatedAt' || col.key === 'createdAt'
+              ? formatDateTime(row[col.key]).toLowerCase()
+              : String(row[col.key] == null ? '' : row[col.key]).toLowerCase();
+            return val.indexOf(f) !== -1;
+          });
+        });
+        if (listState.sortKey) {
+          var key = listState.sortKey;
+          var mul = listState.sortDir === 'asc' ? 1 : -1;
+          rows.sort(function (a, b) {
+            var av = a[key], bv = b[key];
+            if (NUMERIC_KEYS.indexOf(key) >= 0) return (parseFloat(av) - parseFloat(bv)) * mul;
+            if (key === 'updatedAt' || key === 'createdAt') {
+              return (new Date(av) - new Date(bv)) * mul;
+            }
+            return String(av == null ? '' : av).localeCompare(String(bv == null ? '' : bv), 'es') * mul;
+          });
+        }
+        return rows;
+      }
+
+      function renderTableHead() {
+        var head = document.getElementById('listTableHead');
+        var filterRow = document.getElementById('listTableFilterRow');
+        head.innerHTML = '';
+        filterRow.innerHTML = '';
+        COLUMNS.forEach(function (col) {
+          if (!col.visible) return;
+          var th = document.createElement('th');
+          th.className = 'sortable';
+          th.dataset.col = col.key;
+          var sortIcon = 'pi-sort-alt';
+          var active = '';
+          if (listState.sortKey === col.key) {
+            sortIcon = listState.sortDir === 'asc' ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down';
+            active = ' is-active';
+          }
+          th.innerHTML = '<span class="col-header-content"><span class="col-header-text">' + col.label +
+            '</span><i class="pi ' + sortIcon + ' sort-icon' + active + '" aria-hidden="true"></i></span>';
+          th.addEventListener('click', function () {
+            if (listState.sortKey === col.key) {
+              listState.sortDir = listState.sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+              listState.sortKey = col.key;
+              listState.sortDir = 'asc';
+            }
+            renderTableHead();
+            renderTableBody();
+          });
+          head.appendChild(th);
+
+          var fth = document.createElement('th');
+          fth.className = 'filter-cell';
+          var field = document.createElement('div');
+          field.className = 'table-filter-field';
+          var inp = document.createElement('input');
+          inp.type = 'text';
+          inp.className = 'table-filter-input';
+          inp.value = listState.filters[col.key] || '';
+          inp.dataset.filter = col.key;
+          inp.setAttribute('aria-label', 'Filtro de columna: ' + col.label);
+          inp.addEventListener('input', function () {
+            listState.filters[col.key] = inp.value;
+            listState.page = 1;
+            renderTableBody();
+          });
+          var fbtn = document.createElement('button');
+          fbtn.type = 'button';
+          fbtn.className = 'table-filter-btn';
+          fbtn.tabIndex = -1;
+          fbtn.setAttribute('aria-hidden', 'true');
+          fbtn.innerHTML = '<i class="pi pi-filter"></i>';
+          field.appendChild(inp);
+          field.appendChild(fbtn);
+          fth.appendChild(field);
+          filterRow.appendChild(fth);
+        });
+        var actH = document.createElement('th');
+        actH.innerHTML = '<span class="col-header-content"><span class="col-header-text">Acciones</span></span>';
+        actH.className = 'col-actions';
+        head.appendChild(actH);
+        var actF = document.createElement('th');
+        actF.className = 'col-actions filter-cell';
+        filterRow.appendChild(actF);
+      }
+
+      function renderTableBody() {
+        var filtered = getFilteredRecords();
+        var totalPages = Math.max(1, Math.ceil(filtered.length / listState.pageSize));
+        if (listState.page > totalPages) listState.page = totalPages;
+        var start = (listState.page - 1) * listState.pageSize;
+        var pageRows = filtered.slice(start, start + listState.pageSize);
+
+        var body = document.getElementById('listTableBody');
+        body.innerHTML = '';
+        if (!pageRows.length) {
+          var tr = document.createElement('tr');
+          var td = document.createElement('td');
+          td.colSpan = COLUMNS.filter(function (c) { return c.visible; }).length + 1;
+          td.textContent = 'No hay registros para mostrar.';
+          td.style.textAlign = 'center';
+          td.style.padding = '2rem';
+          tr.appendChild(td);
+          body.appendChild(tr);
+        } else {
+          pageRows.forEach(function (row) {
+            var tr = document.createElement('tr');
+            COLUMNS.forEach(function (col) {
+              if (!col.visible) return;
+              var td = document.createElement('td');
+              if (col.key === 'updatedAt' || col.key === 'createdAt') {
+                td.textContent = formatDateTime(row[col.key]);
+              } else if (col.key === 'alturaMaxima') {
+                td.textContent = row[col.key] + ' m³';
+              } else {
+                td.textContent = row[col.key];
+              }
+              tr.appendChild(td);
+            });
+            var actTd = document.createElement('td');
+            actTd.className = 'col-actions';
+            actTd.innerHTML =
+              '<div class="row-actions">' +
+                '<button type="button" class="table-action-btn" data-action="edit" data-id="' + row.id + '" title="Editar" aria-label="Editar"><i class="pi pi-pencil"></i></button>' +
+                '<button type="button" class="table-action-btn" data-action="detail" data-id="' + row.id + '" title="Ver detalle" aria-label="Ver detalle"><i class="pi pi-eye"></i></button>' +
+                '<button type="button" class="table-action-btn table-action-btn--danger" data-action="delete" data-id="' + row.id + '" title="Eliminar" aria-label="Eliminar"><i class="pi pi-trash"></i></button>' +
+              '</div>';
+            tr.appendChild(actTd);
+            body.appendChild(tr);
+          });
+        }
+
+        renderPagination(totalPages);
+      }
+
+      function renderList() {
+        renderTableHead();
+        renderTableBody();
+      }
+
+      function renderPagination(totalPages) {
+        document.getElementById('pagFirst').disabled = listState.page <= 1;
+        document.getElementById('pagPrev').disabled = listState.page <= 1;
+        document.getElementById('pagNext').disabled = listState.page >= totalPages;
+        document.getElementById('pagLast').disabled = listState.page >= totalPages;
+        var pages = document.getElementById('pagPages');
+        pages.innerHTML = '';
+        for (var i = 1; i <= totalPages; i++) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'table-pag-btn' + (i === listState.page ? ' is-active' : '');
+          btn.textContent = i;
+          btn.addEventListener('click', (function (p) {
+            return function () { listState.page = p; renderList(); };
+          })(i));
+          pages.appendChild(btn);
+        }
+      }
+
+      function buildColumnPicker() {
+        var panel = document.getElementById('columnPickerPanel');
+        panel.innerHTML = '<div class="column-picker__title">Columnas visibles</div>';
+        COLUMNS.forEach(function (col) {
+          var label = document.createElement('label');
+          label.className = 'column-picker__item';
+          var cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.checked = col.visible;
+          cb.addEventListener('change', function () {
+            col.visible = cb.checked;
+            renderList();
+          });
+          label.appendChild(cb);
+          label.appendChild(document.createTextNode(col.label));
+          panel.appendChild(label);
+        });
+      }
+
+      function buildExportFormats() {
+        var list = document.getElementById('exportFormatList');
+        list.innerHTML = '';
+        EXPORT_FORMATS.forEach(function (fmt) {
+          var label = document.createElement('label');
+          var radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'exportFormat';
+          radio.value = fmt.id;
+          radio.checked = fmt.id === selectedExportFormat;
+          radio.addEventListener('change', function () { selectedExportFormat = fmt.id; });
+          label.appendChild(radio);
+          label.appendChild(document.createTextNode(fmt.label));
+          list.appendChild(label);
+        });
+      }
+
+      function exportRecords(format) {
+        var rows = getFilteredRecords();
+        var cols = COLUMNS.filter(function (c) { return c.visible; });
+        var headers = cols.map(function (c) { return c.label; });
+        var keys = cols.map(function (c) { return c.key; });
+        var lines = rows.map(function (r) {
+          return keys.map(function (k) {
+            if (k === 'updatedAt' || k === 'createdAt') return formatDateTime(r[k]);
+            if (k === 'alturaMaxima') return r[k] + ' m3';
+            return r[k];
+          });
+        });
+        var filename = 'catalogo-tiendas';
+        var blob;
+        if (format === 'csv' || format === 'xls' || format === 'xlsx') {
+          var csv = [headers.join(',')].concat(lines.map(function (l) {
+            return l.map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',');
+          })).join('\n');
+          blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+          filename += format === 'xlsx' ? '.xlsx' : (format === 'xls' ? '.xls' : '.csv');
+        } else if (format === 'html') {
+          var html = '<html><head><meta charset="utf-8"><title>Catálogo de tiendas</title></head><body><table border="1"><thead><tr>' +
+            headers.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' +
+            lines.map(function (l) { return '<tr>' + l.map(function (v) { return '<td>' + v + '</td>'; }).join('') + '</tr>'; }).join('') +
+            '</tbody></table></body></html>';
+          blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+          filename += '.html';
+        } else if (format === 'text') {
+          var txt = [headers.join('\t')].concat(lines.map(function (l) { return l.join('\t'); })).join('\n');
+          blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+          filename += '.txt';
+        } else {
+          var pdfTxt = 'Catálogo de tiendas\n\n' + [headers.join(' | ')].concat(lines.map(function (l) { return l.join(' | '); })).join('\n');
+          blob = new Blob([pdfTxt], { type: 'application/pdf' });
+          filename += '.pdf';
+        }
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+
+      function initForms() {
+        storeForms.create = new StoreForm('create', 'edit');
+        storeForms.create.mount(document.getElementById('createFormRoot'), {});
+
+        storeForms.edit = new StoreForm('edit', 'edit');
+        storeForms.edit.mount(document.getElementById('editFormRoot'), { idReadonly: true });
+      }
+
+      function escapeHtml(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      function renderDetail(rec) {
+        var storeHeight = rec.alturaMaxima;
+        var rows = [
+          ['Identificador de la tienda', escapeHtml(rec.id)],
+          ['Nombre de la tienda', escapeHtml(rec.nombre)],
+          ['Consignatario asociado', escapeHtml(consignatarioName(rec.consignatario))],
+          ['Altura máxima por tienda', escapeHtml(storeHeight) + ' m<sup>3</sup>'],
+          ['Actualizado por', escapeHtml(rec.updatedBy || '—')],
+          ['Actualizado', escapeHtml(formatDateTimeLong(rec.updatedAt))],
+          ['Creado', escapeHtml(formatDateTimeLong(rec.createdAt))]
+        ];
+
+        var tableHtml = '<table class="detail-table"><tbody>' +
+          rows.map(function (r) {
+            return '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td></tr>';
+          }).join('') +
+          '</tbody></table>';
+
+        var deps = rec.departamentos || [];
+        var deptRows = deps.map(function (d) {
+          var inherited = !(d.altura && d.altura.trim());
+          var value = inherited
+            ? '<span class="dept-height-inherited">Sin configurar (se considera ' + escapeHtml(storeHeight) + ' m<sup>3</sup> de tienda)</span>'
+            : escapeHtml(d.altura) + ' m<sup>3</sup>';
+          return '<tr><td>' + escapeHtml(deptName(d.id)) + '</td><td' + (inherited ? ' class="dept-height-inherited"' : '') + '>' + value + '</td></tr>';
+        }).join('');
+
+        var caret = '<i class="pi pi-sort-alt sort-caret" aria-hidden="true"></i>';
+        var deptHtml =
+          '<div class="detail-count">Mostrando 1-' + deps.length + ' de ' + deps.length + ' elemento(s).</div>' +
+          '<table class="detail-dept-table"><thead><tr>' +
+            '<th>Departamento' + caret + '</th><th>Altura máxima por departamento' + caret + '</th>' +
+          '</tr></thead><tbody>' +
+          (deps.length ? deptRows : '<tr><td colspan="2" style="text-align:center;padding:1.5rem;">Sin departamentos asociados.</td></tr>') +
+          '</tbody></table>';
+
+        document.getElementById('detailFormRoot').innerHTML = tableHtml + deptHtml;
+      }
+
+      function openCreate() {
+        storeForms.create.reset();
+        showView('create');
+      }
+
+      function openEdit(id) {
+        var rec = Store.getById(id);
+        if (!rec) return;
+        editingId = id;
+        storeForms.edit.clearErrors();
+        storeForms.edit.loadData(rec);
+        document.getElementById('editPageTitle').textContent = 'Actualizar tienda ' + id;
+        document.getElementById('editBreadcrumbCurrent').textContent = 'Actualizar tienda ' + id;
+        showView('edit');
+      }
+
+      function openDetail(id) {
+        var rec = Store.getById(id);
+        if (!rec) return;
+        lastDetailId = id;
+        renderDetail(rec);
+        document.getElementById('detailPageTitle').textContent = 'Detalle de tienda ' + id;
+        document.getElementById('detailBreadcrumbCurrent').textContent = 'Detalle de tienda ' + id;
+        showView('detail');
+      }
+
+      function submitCreate() {
+        var form = storeForms.create;
+        if (!form.validate()) return;
+        var values = form.getValues();
+        var now = new Date().toISOString();
+        Store.create({
+          id: values.id,
+          nombre: values.nombre,
+          consignatario: values.consignatario,
+          alturaMaxima: values.alturaMaxima,
+          departamentos: values.departamentos,
+          updatedBy: CURRENT_USER,
+          updatedAt: now,
+          createdAt: now,
+          deleted: false,
+          auditLog: [{ action: 'CREATE', user: CURRENT_USER, at: now }]
+        });
+        showToast('El registro se ha creado correctamente.', '¡Listo!');
+        openDetail(values.id);
+      }
+
+      function submitEdit() {
+        var form = storeForms.edit;
+        if (!form.validate(editingId)) return;
+        var values = form.getValues();
+        var now = new Date().toISOString();
+        var rec = Store.getById(editingId);
+        var log = rec && rec.auditLog ? rec.auditLog.slice() : [];
+        log.push({ action: 'UPDATE', user: CURRENT_USER, at: now });
+        Store.update(editingId, {
+          nombre: values.nombre,
+          consignatario: values.consignatario,
+          alturaMaxima: values.alturaMaxima,
+          departamentos: values.departamentos,
+          updatedBy: CURRENT_USER,
+          updatedAt: now,
+          auditLog: log
+        });
+        showToast('El registro se ha actualizado correctamente.', '¡Listo!');
+        var savedId = editingId;
+        editingId = null;
+        openDetail(savedId);
+      }
+
+      /* ---- Events ---- */
+      document.getElementById('goCreateBtn').addEventListener('click', openCreate);
+      document.getElementById('createSubmitBtn').addEventListener('click', submitCreate);
+      document.getElementById('editSubmitBtn').addEventListener('click', submitEdit);
+      document.getElementById('detailEditBtn').addEventListener('click', function () {
+        if (lastDetailId) openEdit(lastDetailId);
+      });
+
+      document.querySelectorAll('[data-nav="list"]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          editingId = null;
+          showView('list');
+        });
+      });
+
+      document.getElementById('listTableBody').addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        var id = btn.dataset.id;
+        if (btn.dataset.action === 'edit') openEdit(id);
+        else if (btn.dataset.action === 'detail') openDetail(id);
+        else if (btn.dataset.action === 'delete') {
+          deletingId = id;
+          document.getElementById('deleteModalTitle').textContent = 'Eliminar tienda ' + id;
+          document.getElementById('deleteModal').classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('deleteCancelBtn').addEventListener('click', function () {
+        deletingId = null;
+        document.getElementById('deleteModal').classList.add('hidden');
+      });
+      document.getElementById('deleteConfirmBtn').addEventListener('click', function () {
+        if (deletingId) Store.softDelete(deletingId);
+        deletingId = null;
+        document.getElementById('deleteModal').classList.add('hidden');
+        showToast('El registro se ha eliminado correctamente.', '¡Listo!');
+        showView('list');
+      });
+
+      document.getElementById('exportBtn').addEventListener('click', function () {
+        buildExportFormats();
+        document.getElementById('exportModal').classList.remove('hidden');
+      });
+      document.getElementById('exportCancelBtn').addEventListener('click', function () {
+        document.getElementById('exportModal').classList.add('hidden');
+      });
+      document.getElementById('exportConfirmBtn').addEventListener('click', function () {
+        var sel = document.querySelector('input[name="exportFormat"]:checked');
+        exportRecords(sel ? sel.value : 'csv');
+        document.getElementById('exportModal').classList.add('hidden');
+      });
+
+      document.getElementById('columnToggleBtn').addEventListener('click', function (e) {
+        e.stopPropagation();
+        var panel = document.getElementById('columnPickerPanel');
+        var willOpen = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        document.getElementById('columnToggleBtn').setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      });
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.column-picker')) {
+          document.getElementById('columnPickerPanel').classList.add('hidden');
+        }
+      });
+
+      document.getElementById('pageSizeSelect').addEventListener('change', function () {
+        listState.pageSize = Number(this.value);
+        listState.page = 1;
+        renderList();
+      });
+      document.getElementById('pagFirst').addEventListener('click', function () { listState.page = 1; renderList(); });
+      document.getElementById('pagPrev').addEventListener('click', function () { listState.page--; renderList(); });
+      document.getElementById('pagNext').addEventListener('click', function () { listState.page++; renderList(); });
+      document.getElementById('pagLast').addEventListener('click', function () {
+        listState.page = Math.ceil(getFilteredRecords().length / listState.pageSize) || 1;
+        renderList();
+      });
+
+      initForms();
+      buildColumnPicker();
+      Store.load();
+      renderList();
+    })();
+  </script>
+</body>
+</html>
