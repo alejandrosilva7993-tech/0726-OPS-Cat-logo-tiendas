@@ -109,13 +109,43 @@
     .form-input.is-interactive { cursor: text; }
     .form-input.invalid, .form-select.invalid { border-color: #dc2626; box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12); }
 
+    .autocomplete { position: relative; }
+    .autocomplete__panel {
+      position: absolute;
+      top: calc(100% + 0.25rem);
+      left: 0;
+      right: 0;
+      max-height: 15rem;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid var(--surface-200);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      padding: 0.35rem 0;
+      z-index: 60;
+    }
+    .autocomplete__panel.hidden { display: none; }
+    .autocomplete__option {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8125rem;
+      cursor: pointer;
+    }
+    .autocomplete__option:hover,
+    .autocomplete__option.is-active { background: var(--primary-50); }
+    .autocomplete__option-name { color: #334155; font-weight: 500; }
+    .autocomplete__option-id { color: var(--text-color-secondary); font-size: 0.75rem; flex-shrink: 0; }
+    .autocomplete__empty { padding: 0.55rem 0.85rem; font-size: 0.8125rem; color: var(--text-color-secondary); }
+
     .input-with-unit { position: relative; display: flex; align-items: center; }
     .input-with-unit .form-input { padding-right: 3rem; }
     .input-with-unit__unit {
       position: absolute; right: 0.75rem; font-size: 0.8125rem; font-weight: 600;
       color: var(--text-color-secondary); pointer-events: none;
     }
-    .unit-cubic sup { font-size: 0.62em; vertical-align: super; line-height: 0; font-weight: 600; }
 
     .form-actions { display: flex; gap: 0.75rem; margin-top: 2rem; flex-wrap: wrap; }
     .btn {
@@ -659,9 +689,9 @@
       var CURRENT_USER = 'admin.wms';
       // Hasta 10 enteros y hasta 3 decimales, positivo.
       var HEIGHT_FORMAT = /^\d{1,10}(\.\d{1,3})?$/;
-      var ID_FORMAT = /^[A-Za-z0-9_-]{3,50}$/;
+      var ID_FORMAT = /^[A-Za-z0-9_-]{1,50}$/;
       var NAME_FORMAT = /^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñÜü .,'\-]{3,50}$/;
-      var VOLUME_UNIT = '<span class="unit-cubic">m<sup>3</sup></span>';
+      var HEIGHT_UNIT = 'm';
 
       var CONSIGNATARIOS = [
         { id: 'CON-001', nombre: 'Grupo Comercial del Norte' },
@@ -708,7 +738,7 @@
         { key: 'nombre', label: 'Nombre de tienda', visible: true },
         { key: 'consignatarioNombre', label: 'Consignatario asociado', visible: true },
         { key: 'departamentosLabel', label: 'Departamentos asociados', visible: true },
-        { key: 'alturaMaxima', label: 'Altura máxima de tienda', visible: true },
+        { key: 'alturaMaxima', label: 'Altura máxima de tienda (m)', visible: true },
         { key: 'updatedBy', label: 'Actualizado por', visible: true },
         { key: 'updatedAt', label: 'Actualizado', visible: true },
         { key: 'createdAt', label: 'Creado', visible: false }
@@ -889,25 +919,34 @@
             '<div class="section-head"><h2 class="section-title">Información general</h2></div>' +
             '<div class="form-grid form-grid--2">' +
               '<div class="field">' +
-                '<label class="field-label" for="' + p + '-id">Identificador de la tienda<span class="required-mark" aria-hidden="true">*</span></label>' +
+                '<label class="field-label" for="' + p + '-id">Identificador de la tienda</label>' +
                 '<input id="' + p + '-id" type="text" class="form-input' + (idReadonly ? '' : ' is-interactive') + '" maxlength="50" ' + (idReadonly ? 'readonly' : '') + '>' +
                 '<span class="field-error" id="' + p + '-id-error" hidden></span>' +
               '</div>' +
               '<div class="field">' +
-                '<label class="field-label" for="' + p + '-nombre">Nombre<span class="required-mark" aria-hidden="true">*</span></label>' +
+                '<label class="field-label" for="' + p + '-nombre">Nombre</label>' +
                 '<input id="' + p + '-nombre" type="text" class="form-input' + (readonly ? '' : ' is-interactive') + '" maxlength="50" ' + (readonly ? 'readonly' : '') + '>' +
                 '<span class="field-error" id="' + p + '-nombre-error" hidden></span>' +
               '</div>' +
               '<div class="field">' +
-                '<label class="field-label" for="' + p + '-consignatario">Consignatario<span class="required-mark" aria-hidden="true">*</span></label>' +
-                '<select id="' + p + '-consignatario" class="form-select" ' + (readonly ? 'disabled' : '') + '></select>' +
+                '<label class="field-label" for="' + p + '-consignatario-input">Consignatario</label>' +
+                (readonly ?
+                  '<input id="' + p + '-consignatario-input" type="text" class="form-input" readonly>' +
+                  '<input type="hidden" id="' + p + '-consignatario">'
+                :
+                  '<div class="autocomplete" id="' + p + '-consignatario-ac">' +
+                    '<input id="' + p + '-consignatario-input" type="text" class="form-input is-interactive" autocomplete="off" placeholder="Consignatario" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="' + p + '-consignatario-panel">' +
+                    '<input type="hidden" id="' + p + '-consignatario">' +
+                    '<div class="autocomplete__panel hidden" id="' + p + '-consignatario-panel" role="listbox"></div>' +
+                  '</div>'
+                ) +
                 '<span class="field-error" id="' + p + '-consignatario-error" hidden></span>' +
               '</div>' +
               '<div class="field">' +
-                '<label class="field-label" for="' + p + '-altura">Altura máxima de la tarima (tienda)<span class="required-mark" aria-hidden="true">*</span></label>' +
+                '<label class="field-label" for="' + p + '-altura">Altura máxima de la tarima (tienda)</label>' +
                 '<div class="input-with-unit">' +
                   '<input id="' + p + '-altura" type="text" inputmode="decimal" class="form-input' + (readonly ? '' : ' is-interactive') + '" ' + (readonly ? 'readonly' : '') + ' placeholder="0.000">' +
-                  '<span class="input-with-unit__unit">' + VOLUME_UNIT + '</span>' +
+                  '<span class="input-with-unit__unit">' + HEIGHT_UNIT + '</span>' +
                 '</div>' +
                 '<span class="field-error" id="' + p + '-altura-error" hidden></span>' +
               '</div>' +
@@ -921,7 +960,7 @@
             '</div>'
           ) : '') +
           '<section class="form-section' + (readonly ? ' readonly-dept' : '') + '">' +
-            '<div class="section-head"><h2 class="section-title">Departamentos<span class="required-mark" aria-hidden="true">*</span></h2></div>' +
+            '<div class="section-head"><h2 class="section-title">Departamentos</h2></div>' +
             '<div class="info-callout" role="note">' +
               '<i class="pi pi-info-circle" aria-hidden="true"></i>' +
               '<div>' +
@@ -934,21 +973,119 @@
                 '<label class="dept-select-all"><input type="checkbox" id="' + p + '-dept-all"> Seleccionar todos</label>' +
               '</div>') +
             '<div class="dept-panel">' +
-              '<div class="dept-panel__head"><span></span><span>Departamento</span><span>Altura máxima (' + VOLUME_UNIT + ')</span></div>' +
+              '<div class="dept-panel__head"><span></span><span>Departamento</span><span>Altura máxima (' + HEIGHT_UNIT + ')</span></div>' +
               '<div id="' + p + '-dept-rows"></div>' +
             '</div>' +
             '<span class="field-error" id="' + p + '-dept-error" hidden style="margin-top:0.5rem"></span>' +
           '</section>';
 
-        // Poblar consignatarios
-        var sel = this.el('consignatario');
-        sel.innerHTML = '<option value=""></option>' +
-          CONSIGNATARIOS.map(function (c) {
-            return '<option value="' + c.id + '">' + c.nombre + '</option>';
-          }).join('');
-
+        this.initConsignatarioAutocomplete();
         this.renderDepartments();
         this.bindEvents();
+      };
+
+      StoreForm.prototype.setConsignatario = function (value) {
+        var name = value ? consignatarioName(value) : '';
+        var hidden = this.el('consignatario');
+        var input = this.el('consignatario-input');
+        if (hidden) hidden.value = name;
+        if (input) input.value = name;
+      };
+
+      StoreForm.prototype.initConsignatarioAutocomplete = function () {
+        if (this.mode === 'readonly') return;
+        var self = this;
+        var input = this.el('consignatario-input');
+        var hidden = this.el('consignatario');
+        var panel = this.el('consignatario-panel');
+        if (!input || !hidden || !panel) return;
+        var activeIndex = -1;
+        var current = [];
+
+        function filter(q) {
+          q = (q || '').trim().toLowerCase();
+          if (!q) return CONSIGNATARIOS.slice();
+          return CONSIGNATARIOS.filter(function (c) {
+            return c.nombre.toLowerCase().indexOf(q) !== -1 || c.id.toLowerCase().indexOf(q) !== -1;
+          });
+        }
+
+        function render(list) {
+          current = list;
+          activeIndex = -1;
+          if (!list.length) {
+            panel.innerHTML = '<div class="autocomplete__empty">Sin coincidencias</div>';
+            return;
+          }
+          panel.innerHTML = list.map(function (c, i) {
+            return '<div class="autocomplete__option" role="option" data-id="' + c.id + '" data-index="' + i + '">' +
+              '<span class="autocomplete__option-name">' + escapeHtml(c.nombre) + '</span>' +
+            '</div>';
+          }).join('');
+        }
+
+        function open(list) {
+          render(list);
+          panel.classList.remove('hidden');
+          input.setAttribute('aria-expanded', 'true');
+        }
+
+        function close() {
+          panel.classList.add('hidden');
+          input.setAttribute('aria-expanded', 'false');
+          activeIndex = -1;
+        }
+
+        function select(c) {
+          hidden.value = c.nombre;
+          input.value = c.nombre;
+          self.setError('consignatario', '');
+          close();
+        }
+
+        function setActive(i) {
+          activeIndex = i;
+          Array.prototype.forEach.call(panel.querySelectorAll('.autocomplete__option'), function (opt, idx) {
+            var on = idx === activeIndex;
+            opt.classList.toggle('is-active', on);
+            if (on) opt.scrollIntoView({ block: 'nearest' });
+          });
+        }
+
+        input.addEventListener('focus', function () { open(filter('')); });
+        input.addEventListener('input', function () {
+          hidden.value = input.value.trim();
+          if (hidden.value) self.setError('consignatario', '');
+          open(filter(input.value));
+        });
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'ArrowDown') {
+            if (panel.classList.contains('hidden')) open(filter(hidden.value ? '' : input.value));
+            if (current.length) { setActive((activeIndex + 1) % current.length); e.preventDefault(); }
+          } else if (e.key === 'ArrowUp') {
+            if (current.length) { setActive((activeIndex - 1 + current.length) % current.length); e.preventDefault(); }
+          } else if (e.key === 'Enter') {
+            if (!panel.classList.contains('hidden') && activeIndex >= 0 && current[activeIndex]) {
+              select(current[activeIndex]);
+              e.preventDefault();
+            }
+          } else if (e.key === 'Escape') {
+            close();
+          }
+        });
+        panel.addEventListener('mousedown', function (e) {
+          var opt = e.target.closest('.autocomplete__option');
+          if (!opt) return;
+          e.preventDefault();
+          var c = CONSIGNATARIOS.find(function (x) { return x.id === opt.dataset.id; });
+          if (c) select(c);
+        });
+        input.addEventListener('blur', function () {
+          setTimeout(function () {
+            close();
+            hidden.value = input.value.trim();
+          }, 150);
+        });
       };
 
       StoreForm.prototype.bindEvents = function () {
@@ -984,7 +1121,7 @@
             '<div class="dept-row__height">' +
               '<div class="input-with-unit">' +
                 '<input type="text" inputmode="decimal" class="form-input" data-dept-height="' + d.id + '" value="' + altura + '" placeholder="0.000" ' + (readonly || !checked ? 'disabled' : '') + '>' +
-                '<span class="input-with-unit__unit">' + VOLUME_UNIT + '</span>' +
+                '<span class="input-with-unit__unit">' + HEIGHT_UNIT + '</span>' +
               '</div>' +
               '<span class="dept-row__error" data-dept-error="' + d.id + '" hidden></span>' +
             '</div>';
@@ -1023,7 +1160,7 @@
       StoreForm.prototype.loadData = function (rec) {
         this.el('id').value = rec.id;
         this.el('nombre').value = rec.nombre;
-        this.el('consignatario').value = rec.consignatario;
+        this.setConsignatario(rec.consignatario);
         this.el('altura').value = rec.alturaMaxima;
         this.selectedDepts = {};
         (rec.departamentos || []).forEach(function (d) {
@@ -1040,7 +1177,7 @@
       StoreForm.prototype.reset = function () {
         this.el('id').value = '';
         this.el('nombre').value = '';
-        this.el('consignatario').value = '';
+        this.setConsignatario('');
         this.el('altura').value = '';
         this.selectedDepts = {};
         this.renderDepartments();
@@ -1049,9 +1186,9 @@
 
       StoreForm.prototype.setError = function (field, msg) {
         var err = this.el(field + '-error');
-        var input = this.el(field);
+        var visual = this.el(field + '-input') || this.el(field);
         if (err) { err.textContent = msg; err.hidden = !msg; }
-        if (input) input.classList.toggle('invalid', !!msg);
+        if (visual) visual.classList.toggle('invalid', !!msg);
       };
 
       StoreForm.prototype.clearErrors = function () {
@@ -1069,7 +1206,7 @@
         var altura = this.el('altura').value.trim();
 
         if (!ID_FORMAT.test(id)) {
-          this.setError('id', 'Ingresa un identificador alfanumérico de 3 a 50 caracteres.');
+          this.setError('id', 'Ingresa un identificador alfanumérico de 1 a 50 caracteres.');
           ok = false;
         } else if (Store.idExists(id, excludeId)) {
           this.setError('id', 'El identificador ya existe. Debe ser único por sitio.');
@@ -1108,7 +1245,7 @@
             if (errEl) { errEl.textContent = 'Valor decimal positivo (hasta 10 enteros y 3 decimales).'; errEl.hidden = false; }
             ok = false;
           } else if (HEIGHT_FORMAT.test(altura) && depNum > alturaNum) {
-            if (errEl) { errEl.textContent = 'No puede exceder la altura máxima de la tienda (' + altura + ' m³).'; errEl.hidden = false; }
+            if (errEl) { errEl.textContent = 'No puede exceder la altura máxima de la tienda (' + altura + ' m).'; errEl.hidden = false; }
             ok = false;
           }
         }, this);
@@ -1248,7 +1385,7 @@
               if (col.key === 'updatedAt' || col.key === 'createdAt') {
                 td.textContent = formatDateTime(row[col.key]);
               } else if (col.key === 'alturaMaxima') {
-                td.textContent = row[col.key] + ' m³';
+                td.textContent = row[col.key];
               } else {
                 td.textContent = row[col.key];
               }
@@ -1338,7 +1475,7 @@
         var lines = rows.map(function (r) {
           return keys.map(function (k) {
             if (k === 'updatedAt' || k === 'createdAt') return formatDateTime(r[k]);
-            if (k === 'alturaMaxima') return r[k] + ' m3';
+            if (k === 'alturaMaxima') return r[k];
             return r[k];
           });
         });
@@ -1393,7 +1530,7 @@
           ['Identificador de la tienda', escapeHtml(rec.id)],
           ['Nombre de la tienda', escapeHtml(rec.nombre)],
           ['Consignatario asociado', escapeHtml(consignatarioName(rec.consignatario))],
-          ['Altura máxima por tienda', escapeHtml(storeHeight) + ' m<sup>3</sup>'],
+          ['Altura máxima por tienda', escapeHtml(storeHeight) + ' m'],
           ['Actualizado por', escapeHtml(rec.updatedBy || '—')],
           ['Actualizado', escapeHtml(formatDateTimeLong(rec.updatedAt))],
           ['Creado', escapeHtml(formatDateTimeLong(rec.createdAt))]
@@ -1409,8 +1546,8 @@
         var deptRows = deps.map(function (d) {
           var inherited = !(d.altura && d.altura.trim());
           var value = inherited
-            ? '<span class="dept-height-inherited">Sin configurar (se considera ' + escapeHtml(storeHeight) + ' m<sup>3</sup> de tienda)</span>'
-            : escapeHtml(d.altura) + ' m<sup>3</sup>';
+            ? '<span class="dept-height-inherited">Sin configurar (se considera ' + escapeHtml(storeHeight) + ' m de tienda)</span>'
+            : escapeHtml(d.altura) + ' m';
           return '<tr><td>' + escapeHtml(deptName(d.id)) + '</td><td' + (inherited ? ' class="dept-height-inherited"' : '') + '>' + value + '</td></tr>';
         }).join('');
 
