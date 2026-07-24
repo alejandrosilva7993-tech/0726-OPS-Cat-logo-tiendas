@@ -1052,15 +1052,16 @@
           });
         }
 
-        input.addEventListener('focus', function () { open(filter('')); });
         input.addEventListener('input', function () {
-          hidden.value = input.value.trim();
-          if (hidden.value) self.setError('consignatario', '');
-          open(filter(input.value));
+          var q = input.value.trim();
+          hidden.value = q;
+          if (q) self.setError('consignatario', '');
+          if (q) open(filter(input.value));
+          else close();
         });
         input.addEventListener('keydown', function (e) {
           if (e.key === 'ArrowDown') {
-            if (panel.classList.contains('hidden')) open(filter(hidden.value ? '' : input.value));
+            if (panel.classList.contains('hidden') && input.value.trim()) open(filter(input.value));
             if (current.length) { setActive((activeIndex + 1) % current.length); e.preventDefault(); }
           } else if (e.key === 'ArrowUp') {
             if (current.length) { setActive((activeIndex - 1 + current.length) % current.length); e.preventDefault(); }
